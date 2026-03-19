@@ -23,8 +23,13 @@ export default function Sidebar({ userEmail }: { userEmail: string }) {
 
   return (
     <aside className="w-56 bg-white border-r border-gray-200 flex flex-col">
-      <div className="p-5 border-b border-gray-100">
-        <span className="text-base font-bold text-gray-900">RUC-Sunat API</span>
+      <div className="p-5 border-b border-gray-100 flex items-center gap-2">
+        <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center shrink-0">
+          <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
+          </svg>
+        </div>
+        <span className="text-base font-bold text-gray-900">Consulta Perú API</span>
       </div>
 
       <nav className="flex-1 p-3 space-y-0.5">

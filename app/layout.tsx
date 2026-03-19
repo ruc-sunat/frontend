@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "RUC-Sunat API",
+  title: "Consulta Perú API",
   description: "Dashboard de consultas al padrón SUNAT",
 };
 
