@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
 const PLAN_AMOUNTS: Record<number, Record<string, number>> = {
-  2: { monthly: 3500,   annual: 35000  },  // S/.35/mes o S/.350/año
-  3: { monthly: 10900,  annual: 109000 },  // S/.109/mes o S/.1,090/año
+  2: { monthly: 1900,  annual: 17000 },  // S/.19/mes o S/.170/año
+  3: { monthly: 3500,  annual: 30000 },  // S/.35/mes o S/.300/año
 }
 
 export async function POST(request: NextRequest) {

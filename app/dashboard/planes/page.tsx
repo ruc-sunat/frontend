@@ -9,30 +9,52 @@ const PLANES = [
     nombre: 'Free',
     precio: 0,
     moneda: '',
-    consultas: '100 consultas/mes',
-    features: ['100 consultas mensuales', 'Soporte por email', 'Acceso a la API REST'],
+    consultas: '500 consultas/mes',
+    features: [
+      '500 consultas mensuales',
+      '2 req/seg (rate limit)',
+      'GET /ruc/{ruc}',
+      'Datos completos del RUC',
+      'Documentación y ejemplos',
+    ],
   },
   {
     id: 2,
-    nombre: 'Básico',
-    precio: 35,
+    nombre: 'Starter',
+    precio: 19,
     moneda: 'PEN',
-    consultas: '5,000 consultas/mes',
-    features: ['5,000 consultas mensuales', 'Soporte prioritario', 'Acceso a la API REST', 'Historial de consultas'],
+    consultas: 'Consultas ilimitadas',
+    features: [
+      'Consultas ilimitadas',
+      '10 req/seg (rate limit)',
+      'GET /ruc/{ruc}',
+      'Datos completos del RUC',
+      'Soporte por correo',
+      'Factura electrónica',
+    ],
   },
   {
     id: 3,
     nombre: 'Pro',
-    precio: 109,
+    precio: 35,
     moneda: 'PEN',
-    consultas: '50,000 consultas/mes',
-    features: ['50,000 consultas mensuales', 'Soporte prioritario 24/7', 'Acceso a la API REST', 'Historial de consultas', 'SLA garantizado'],
+    consultas: 'Consultas ilimitadas',
+    features: [
+      'Consultas ilimitadas',
+      '30 req/seg (rate limit)',
+      'GET /ruc/{ruc}',
+      'Búsqueda por razón social',
+      'Representantes legales e historial',
+      'Endpoints futuros (DNI, TC, etc.)',
+      'Soporte por WhatsApp',
+      'SLA 99.5% · Factura electrónica',
+    ],
   },
 ]
 
 const PRECIOS_ANUALES: Record<number, number> = {
-  2: 350,
-  3: 1090,
+  2: 170,
+  3: 300,
 }
 
 declare global {
@@ -405,7 +427,7 @@ export default function PlanesPage() {
           >
             Anual
             <span className="ml-1.5 text-xs font-semibold text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full">
-              2 meses gratis
+              Hasta 29% de descuento
             </span>
           </button>
         </div>
