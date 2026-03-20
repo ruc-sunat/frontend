@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         amount,
         currency: 'PEN',
-        orderId: `ruc-${user.id.slice(0, 8)}-${billing_cycle[0]}-${Date.now()}`,
+        orderId: `ruc-${plan_id}-${billing_cycle[0]}-${user.id.replace(/-/g, '')}`,
         customer: { email: user.email },
       }),
     })
