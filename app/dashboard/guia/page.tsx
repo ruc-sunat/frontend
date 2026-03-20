@@ -12,28 +12,33 @@ const tabs: { id: Lang; label: string; filename: string }[] = [
 ]
 
 const fields = [
-  { name: 'ruc',         desc: 'Número de RUC del contribuyente (11 dígitos)' },
-  { name: 'razonSocial', desc: 'Nombre o razón social registrada en SUNAT' },
-  { name: 'estado',      desc: 'Estado del contribuyente: ACTIVO, BAJA, etc.' },
-  { name: 'condicion',   desc: 'Condición de domicilio: HABIDO, NO HABIDO, etc.' },
-  { name: 'direccion',   desc: 'Domicilio fiscal registrado' },
-  { name: 'ubigeo',      desc: 'Ubicación geográfica: Departamento, Provincia, Distrito' },
+  { name: 'ruc',          desc: 'Número de RUC del contribuyente (11 dígitos)' },
+  { name: 'razon_social', desc: 'Nombre o razón social registrada en SUNAT' },
+  { name: 'estado',       desc: 'Estado del contribuyente: ACTIVO, BAJA, etc.' },
+  { name: 'condicion',    desc: 'Condición de domicilio: HABIDO, NO HABIDO, etc.' },
+  { name: 'ubigeo',       desc: 'Código de ubicación geográfica (6 dígitos)' },
+  { name: 'direccion',    desc: 'Objeto con domicilio fiscal: tipo_via, nom_via, nro, distrito, provincia, departamento' },
 ]
 
 const codeSnippets: Record<Lang, string> = {
   curl: `# Consulta un RUC
-curl -X GET \\
-  "https://api.consultaperuapi.com/api/ruc/20601138572" \\
-  -H "Authorization: Bearer TU_API_KEY"
+curl -X POST \\
+  "https://api.consultaperuapi.com/api/v1/consultas" \\
+  -H "Content-Type: application/json" \\
+  -d '{"token": "TU_API_KEY", "ruc": "20601138572"}'
 
 # Respuesta
 {
   "ruc": "20601138572",
-  "razonSocial": "EMPRESA EJEMPLO S.A.C.",
+  "razon_social": "EMPRESA EJEMPLO S.A.C.",
   "estado": "ACTIVO",
   "condicion": "HABIDO",
-  "direccion": "AV. EJEMPLO 123, LIMA",
-  "ubigeo": "LIMA, LIMA, LIMA"
+  "ubigeo": "150101",
+  "direccion": {
+    "departamento": "LIMA",
+    "provincia": "LIMA",
+    "distrito": "LIMA"
+  }
 }`,
 
   python: `import requests
@@ -41,54 +46,49 @@ curl -X GET \\
 API_KEY = "TU_API_KEY"
 RUC     = "20601138572"
 
-headers = {
-    "Authorization": f"Bearer {API_KEY}"
-}
-
-response = requests.get(
-    f"https://api.consultaperuapi.com/api/ruc/{RUC}",
-    headers=headers
+response = requests.post(
+    "https://api.consultaperuapi.com/api/v1/consultas",
+    json={"token": API_KEY, "ruc": RUC}
 )
 
 data = response.json()
-print(data["razonSocial"])  # "EMPRESA EJEMPLO S.A.C."
-print(data["estado"])       # "ACTIVO"`,
+print(data["razon_social"])  # "EMPRESA EJEMPLO S.A.C."
+print(data["estado"])        # "ACTIVO"`,
 
   javascript: `const API_KEY = "TU_API_KEY";
-const ruc    = "20601138572";
+const ruc     = "20601138572";
 
 const response = await fetch(
-  \`https://api.consultaperuapi.com/api/ruc/\${ruc}\`,
+  "https://api.consultaperuapi.com/api/v1/consultas",
   {
-    headers: {
-      "Authorization": \`Bearer \${API_KEY}\`
-    }
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token: API_KEY, ruc })
   }
 );
 
 const data = await response.json();
-console.log(data.razonSocial);  // "EMPRESA EJEMPLO S.A.C."
-console.log(data.estado);       // "ACTIVO"`,
+console.log(data.razon_social);  // "EMPRESA EJEMPLO S.A.C."
+console.log(data.estado);        // "ACTIVO"`,
 
   php: `<?php
 
 $apiKey = "TU_API_KEY";
 $ruc    = "20601138572";
-$url    = "https://api.consultaperuapi.com/api/ruc/{$ruc}";
 
-$ch = curl_init($url);
+$ch = curl_init("https://api.consultaperuapi.com/api/v1/consultas");
 curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_HTTPHEADER     => [
-        "Authorization: Bearer {$apiKey}"
-    ]
+    CURLOPT_POST           => true,
+    CURLOPT_HTTPHEADER     => ["Content-Type: application/json"],
+    CURLOPT_POSTFIELDS     => json_encode(["token" => $apiKey, "ruc" => $ruc])
 ]);
 
 $body = curl_exec($ch);
 $data = json_decode($body);
 
-echo $data->razonSocial;  // "EMPRESA EJEMPLO S.A.C."
-echo $data->estado;       // "ACTIVO"`,
+echo $data->razon_social;  // "EMPRESA EJEMPLO S.A.C."
+echo $data->estado;        // "ACTIVO"`,
 }
 
 export default function GuiaPage() {
@@ -112,13 +112,11 @@ export default function GuiaPage() {
       <div className="bg-white rounded-xl border border-gray-200 p-5 mb-5">
         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Endpoint</p>
         <div className="flex items-center gap-3">
-          <span className="bg-green-50 text-green-700 text-xs font-bold px-2 py-1 rounded">GET</span>
-          <code className="text-sm font-mono text-gray-800">
-            /api/ruc/<span className="text-blue-600">{'{ruc}'}</span>
-          </code>
+          <span className="bg-blue-50 text-blue-700 text-xs font-bold px-2 py-1 rounded">POST</span>
+          <code className="text-sm font-mono text-gray-800">/api/v1/consultas</code>
         </div>
         <p className="text-xs text-gray-400 mt-2">
-          Header requerido: <code className="bg-gray-100 px-1 rounded">Authorization: Bearer TU_API_KEY</code>
+          Body requerido: <code className="bg-gray-100 px-1 rounded">{`{ "token": "TU_API_KEY", "ruc": "20601138572" }`}</code>
         </p>
       </div>
 
