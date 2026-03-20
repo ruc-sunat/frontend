@@ -8,6 +8,7 @@ const navItems = [
   { href: '/dashboard', label: 'Resumen', icon: '◈' },
   { href: '/dashboard/tokens', label: 'Tokens', icon: '⚿' },
   { href: '/dashboard/planes', label: 'Planes', icon: '◇' },
+  { href: '/dashboard/guia', label: 'Guía', icon: '◎' },
 ]
 
 export default function Sidebar({ userEmail }: { userEmail: string }) {
