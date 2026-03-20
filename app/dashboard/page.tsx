@@ -4,7 +4,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000'
 
 const PLAN_LABELS: Record<string, string> = {
   free: 'Free',
-  basico: 'Básico',
+  basico: 'Starter',
   pro: 'Pro',
 }
 
@@ -33,7 +33,8 @@ export default async function DashboardPage() {
   const consultas = uso?.consultas_este_mes ?? 0
   const limite = uso?.limite ?? 100
   const plan = uso?.plan ?? 'free'
-  const porcentaje = limite > 0 ? Math.min((consultas / limite) * 100, 100) : 0
+  const ilimitado = limite === -1
+  const porcentaje = !ilimitado && limite > 0 ? Math.min((consultas / limite) * 100, 100) : 0
 
   const ahora = new Date()
   const resetDate = new Date(ahora.getFullYear(), ahora.getMonth() + 1, 1)
@@ -51,7 +52,7 @@ export default async function DashboardPage() {
             <p className="text-3xl font-bold text-gray-900 mt-0.5">
               {consultas.toLocaleString()}
               <span className="text-lg font-normal text-gray-400">
-                {' '}/ {limite.toLocaleString()}
+                {' '}/ {ilimitado ? 'Ilimitado' : limite.toLocaleString()}
               </span>
             </p>
           </div>
@@ -69,7 +70,7 @@ export default async function DashboardPage() {
           />
         </div>
         <p className="text-xs text-gray-400 mt-2">
-          Reset el {resetStr} · {Math.round(porcentaje)}% usado
+          Reset el {resetStr}{!ilimitado && ` · ${Math.round(porcentaje)}% usado`}
         </p>
       </div>
 

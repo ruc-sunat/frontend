@@ -23,7 +23,7 @@ const fields = [
 const codeSnippets: Record<Lang, string> = {
   curl: `# Consulta un RUC
 curl -X GET \\
-  "https://app.consultaperuapi.com/api/ruc/20601138572" \\
+  "https://api.consultaperuapi.com/api/ruc/20601138572" \\
   -H "Authorization: Bearer TU_API_KEY"
 
 # Respuesta
@@ -46,7 +46,7 @@ headers = {
 }
 
 response = requests.get(
-    f"https://app.consultaperuapi.com/api/ruc/{RUC}",
+    f"https://api.consultaperuapi.com/api/ruc/{RUC}",
     headers=headers
 )
 
@@ -58,7 +58,7 @@ print(data["estado"])       # "ACTIVO"`,
 const ruc    = "20601138572";
 
 const response = await fetch(
-  \`https://app.consultaperuapi.com/api/ruc/\${ruc}\`,
+  \`https://api.consultaperuapi.com/api/ruc/\${ruc}\`,
   {
     headers: {
       "Authorization": \`Bearer \${API_KEY}\`
@@ -74,7 +74,7 @@ console.log(data.estado);       // "ACTIVO"`,
 
 $apiKey = "TU_API_KEY";
 $ruc    = "20601138572";
-$url    = "https://app.consultaperuapi.com/api/ruc/{$ruc}";
+$url    = "https://api.consultaperuapi.com/api/ruc/{$ruc}";
 
 $ch = curl_init($url);
 curl_setopt_array($ch, [
