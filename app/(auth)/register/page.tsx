@@ -51,7 +51,7 @@ export default function RegisterPage() {
             <span className="font-semibold text-gray-900">Consulta Perú API</span>
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Crear cuenta</h1>
-          <p className="text-sm text-gray-500 mb-6">Empieza gratis con 100 consultas/mes</p>
+          <p className="text-sm text-gray-500 mb-6">Empieza gratis con 500 consultas/mes</p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
