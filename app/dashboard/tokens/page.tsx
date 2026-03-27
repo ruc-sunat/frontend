@@ -11,6 +11,13 @@ type Token = {
   created_at: string
 }
 
+// Límites de tokens por plan
+const TOKEN_LIMITS = {
+  1: 1,    // Free: 1 token
+  2: 10,   // Starter: 10 tokens
+  3: -1,   // Pro: ilimitado
+}
+
 export default function TokensPage() {
   const [tokens, setTokens] = useState<Token[]>([])
   const [loading, setLoading] = useState(true)
@@ -18,14 +25,28 @@ export default function TokensPage() {
   const [creating, setCreating] = useState(false)
   const [copied, setCopied] = useState<string | null>(null)
   const [error, setError] = useState('')
+  const [planId, setPlanId] = useState<number>(1)
 
   const supabase = createClient()
+
+  const tokenLimit = TOKEN_LIMITS[planId as keyof typeof TOKEN_LIMITS] ?? 1
+  const isUnlimited = tokenLimit === -1
+  const canCreateToken = isUnlimited || tokens.length < tokenLimit
 
   const fetchTokens = async () => {
     const {
       data: { user },
     } = await supabase.auth.getUser()
     if (!user) return
+
+    // Fetch user plan
+    const { data: userData } = await supabase
+      .from('users')
+      .select('plan_id')
+      .eq('id', user.id)
+      .single()
+
+    setPlanId(userData?.plan_id ?? 1)
 
     const { data } = await supabase
       .from('tokens')
@@ -44,6 +65,12 @@ export default function TokensPage() {
   const createToken = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+
+    if (!canCreateToken) {
+      setError(`Has alcanzado el límite de ${tokenLimit} token${tokenLimit === 1 ? '' : 's'} para tu plan`)
+      return
+    }
+
     setCreating(true)
 
     const {
@@ -84,18 +111,26 @@ export default function TokensPage() {
 
       {/* Crear token */}
       <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-        <h2 className="text-sm font-semibold text-gray-700 mb-3">Nuevo token</h2>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-sm font-semibold text-gray-700">Nuevo token</h2>
+          {!isUnlimited && (
+            <span className="text-xs text-gray-500">
+              {tokens.length} / {tokenLimit} tokens
+            </span>
+          )}
+        </div>
         <form onSubmit={createToken} className="flex gap-3">
           <input
             type="text"
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
             placeholder="Nombre descriptivo (opcional)"
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={!canCreateToken}
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-500"
           />
           <button
             type="submit"
-            disabled={creating}
+            disabled={creating || !canCreateToken}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors whitespace-nowrap"
           >
             {creating ? 'Creando...' : 'Crear token'}

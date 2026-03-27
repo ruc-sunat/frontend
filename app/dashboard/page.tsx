@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import ProSupportCard from "./ProSupportCard";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
 
@@ -86,6 +87,9 @@ export default async function DashboardPage() {
   return (
     <div className="max-w-3xl">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Resumen</h1>
+
+      {/* Card soporte Pro */}
+      {isSubscriptionValid && planData?.id === 3 && <ProSupportCard />}
 
       {/* Card uso mensual */}
       <div className="bg-white rounded-xl border border-gray-200 p-6 mb-4">
