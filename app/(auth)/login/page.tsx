@@ -1,17 +1,25 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+
+  useEffect(() => {
+    const errorDescription = searchParams.get('error_description')
+    if (errorDescription) {
+      setError(decodeURIComponent(errorDescription))
+    }
+  }, [searchParams])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -109,12 +117,20 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <p className="mt-4 text-center text-sm text-gray-500">
-            ¿No tienes cuenta?{' '}
-            <Link href="/register" className="text-blue-600 hover:underline font-medium">
-              Registrarse
-            </Link>
-          </p>
+          <div className="mt-4 flex flex-col gap-3">
+            <p className="text-center text-sm text-gray-500">
+              ¿No tienes cuenta?{' '}
+              <Link href="/register" className="text-blue-600 hover:underline font-medium">
+                Registrarse
+              </Link>
+            </p>
+            <p className="text-center text-sm text-gray-500">
+              ¿Olvidaste tu contraseña?{' '}
+              <Link href="/forgot-password" className="text-blue-600 hover:underline font-medium">
+                Recuperar
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>
