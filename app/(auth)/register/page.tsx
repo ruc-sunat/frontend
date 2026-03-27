@@ -2,12 +2,12 @@
 
 export const dynamic = 'force-dynamic'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 
-export default function RegisterPage() {
+function RegisterContent() {
   const router = useRouter()
   const [nombre, setNombre] = useState('')
   const [email, setEmail] = useState('')
@@ -142,5 +142,13 @@ export default function RegisterPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gray-50" />}>
+      <RegisterContent />
+    </Suspense>
   )
 }
