@@ -173,7 +173,7 @@ export default function TokensPage() {
               <div className="flex gap-2 flex-shrink-0">
                 <button
                   onClick={() => copyToken(t.token)}
-                  className="text-xs px-3 py-1.5 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="text-xs px-3 py-1.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 hover:border-gray-400 transition-colors cursor-pointer font-medium"
                 >
                   {copied === t.token ? '✓ Copiado' : 'Copiar'}
                 </button>
