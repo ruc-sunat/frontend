@@ -29,7 +29,7 @@ export default function RootLayout({
         {/* Google Analytics */}
         <Script
           async
-          src="https://www.googletagmanager.com/gtag/js?id=G-QC7LS7PMR6"
+          src="https://www.googletagmanager.com/gtag/js?id=G-CCSG3JBKX1"
           strategy="afterInteractive"
         />
         <Script
@@ -40,7 +40,7 @@ export default function RootLayout({
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
-              gtag('config', 'G-QC7LS7PMR6');
+              gtag('config', 'G-CCSG3JBKX1');
             `,
           }}
         />
