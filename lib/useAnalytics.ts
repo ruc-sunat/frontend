@@ -13,7 +13,7 @@ export function useAnalytics() {
 
   const trackPageView = (pageName: string) => {
     if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('config', 'G-CCSG3JBKX1', {
+      (window as any).gtag('config', 'G-QC7LS7PMR6', {
         'page_path': pageName,
       });
     }
