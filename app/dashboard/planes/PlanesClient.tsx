@@ -12,7 +12,7 @@ const PLANES = [
     features: [
       "500 consultas mensuales",
       "2 req/seg (rate limit)",
-      "POST /ruc/{ruc} o POST /dni/{dni}",
+      "POST /ruc/{ruc} y POST /dni/{dni}",
     ],
   },
   {
@@ -24,11 +24,10 @@ const PLANES = [
     features: [
       "Consultas ilimitadas",
       "10 req/seg (rate limit)",
-      "POST /ruc/{ruc} o POST /dni/{dni}",
+      "POST /ruc/{ruc} y POST /dni/{dni}",
       "GET Tipo de cambio SBS",
       "Datos completos del RUC y DNI",
       "Documentación y ejemplos",
-      "Endpoints futuros (DNI, TC, etc.)",
     ],
   },
   {
@@ -40,12 +39,10 @@ const PLANES = [
     features: [
       "Consultas ilimitadas",
       "30 req/seg (rate limit)",
-      "POST /ruc/{ruc} o POST /dni/{dni}",
+      "POST /ruc/{ruc} y POST /dni/{dni}",
       "GET Tipo de cambio SBS",
-      "Datos completos del RUC y DN",
+      "Datos completos del RUC y DNI",
       "Documentación y ejemplos",
-      "Consulta por DNI (padrón local + fallback)",
-      "Endpoints futuros (DNI, TC, etc.)",
       "Soporte virtual para implementación",
     ],
   },
