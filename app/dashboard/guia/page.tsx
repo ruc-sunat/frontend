@@ -3,7 +3,7 @@
 import { useState } from 'react'
 
 type Lang = 'curl' | 'python' | 'javascript' | 'php'
-type EndpointType = 'ruc' | 'dni' | 'tipocambio'
+type EndpointType = 'ruc' | 'dni' | 'tipocambio' | 'cpe'
 
 const languageTabs: { id: Lang; label: string }[] = [
   { id: 'curl',       label: 'cURL'       },
@@ -16,6 +16,7 @@ const filenameMap: Record<EndpointType, Record<Lang, string>> = {
   ruc:        { curl: 'consulta.sh',     python: 'consulta.py',     javascript: 'consulta.js',     php: 'consulta.php'     },
   dni:        { curl: 'consulta.sh',     python: 'consulta.py',     javascript: 'consulta.js',     php: 'consulta.php'     },
   tipocambio: { curl: 'tipo_cambio.sh',  python: 'tipo_cambio.py',  javascript: 'tipo_cambio.js',  php: 'tipo_cambio.php'  },
+  cpe:        { curl: 'validar_cpe.sh',  python: 'validar_cpe.py',  javascript: 'validar_cpe.js',  php: 'validar_cpe.php'  },
 }
 
 const rucFields = [
@@ -43,6 +44,19 @@ const tipocambioFields = [
   { name: 'compra',  desc: 'Tipo de cambio de compra (soles por unidad)' },
   { name: 'venta',   desc: 'Tipo de cambio de venta (soles por unidad)' },
   { name: 'fuente',  desc: 'Fuente oficial de los datos: SBS' },
+]
+
+const cpeFields = [
+  { name: 'valido',               desc: 'true si el comprobante existe y es válido en SUNAT' },
+  { name: 'tipo_comprobante',     desc: 'Código del tipo: 01=Factura, 03=Boleta, 07=Nota crédito, 08=Nota débito' },
+  { name: 'descripcion_tipo',     desc: 'Descripción legible del tipo de comprobante' },
+  { name: 'fecha_emision',        desc: 'Fecha de emisión del comprobante (YYYY-MM-DD)' },
+  { name: 'monto_total',          desc: 'Monto total del comprobante en soles' },
+  { name: 'estado',               desc: 'Estado en SUNAT: ACEPTADO, ANULADO, NO EXISTE, AUTORIZADO' },
+  { name: 'estado_contribuyente', desc: 'Estado del emisor: ACTIVO, BAJA, etc.' },
+  { name: 'condicion_domicilio',  desc: 'Condición del domicilio del emisor: HABIDO, NO HABIDO, etc.' },
+  { name: 'observaciones',        desc: 'Observaciones adicionales de SUNAT (puede ser null)' },
+  { name: 'fuente',               desc: 'Fuente de la consulta: SUNAT' },
 ]
 
 const codeSnippets: Record<EndpointType, Record<Lang, string>> = {
@@ -273,6 +287,106 @@ echo $data->compra;   // 3.710
 echo $data->venta;    // 3.715
 echo $data->fuente;   // "SBS"`,
   },
+
+  cpe: {
+    curl: `# Valida un comprobante electrónico (requiere plan Starter o Pro)
+curl -X POST \\
+  "https://api.consultaperuapi.com/api/v1/cpe/consultar" \\
+  -H "Content-Type: application/json" \\
+  -d '{"token":"TU_API_KEY","ruc":"20601138572","tipo":"01","serie":"F001","correlativo":"1234","fecha":"2026-01-15","monto":1180.00}'
+
+# Respuesta
+{
+  "valido": true,
+  "ruc_emisor": "20601138572",
+  "tipo_comprobante": "01",
+  "descripcion_tipo": "Factura",
+  "serie": "F001",
+  "correlativo": "1234",
+  "fecha_emision": "2026-01-15",
+  "monto_total": 1180.00,
+  "estado": "ACEPTADO",
+  "estado_contribuyente": "ACTIVO",
+  "condicion_domicilio": "HABIDO",
+  "observaciones": null,
+  "fuente": "SUNAT"
+}`,
+
+    python: `import requests
+
+API_KEY     = "TU_API_KEY"
+RUC         = "20601138572"
+TIPO        = "01"   # 01=Factura, 03=Boleta, 07=Nota crédito, 08=Nota débito
+SERIE       = "F001"
+CORRELATIVO = "1234"
+FECHA       = "2026-01-15"
+MONTO       = 1180.00
+
+response = requests.post(
+    "https://api.consultaperuapi.com/api/v1/cpe/consultar",
+    json={
+        "token": API_KEY, "ruc": RUC, "tipo": TIPO,
+        "serie": SERIE, "correlativo": CORRELATIVO,
+        "fecha": FECHA, "monto": MONTO
+    }
+)
+
+data = response.json()
+print(data["valido"])   # True
+print(data["estado"])   # "ACEPTADO"
+print(data["fuente"])   # "SUNAT"`,
+
+    javascript: `const API_KEY = "TU_API_KEY";
+
+const response = await fetch(
+  "https://api.consultaperuapi.com/api/v1/cpe/consultar",
+  {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      token:       API_KEY,
+      ruc:         "20601138572",
+      tipo:        "01",  // 01=Factura, 03=Boleta, 07=Nota crédito, 08=Nota débito
+      serie:       "F001",
+      correlativo: "1234",
+      fecha:       "2026-01-15",
+      monto:       1180.00
+    })
+  }
+);
+
+const data = await response.json();
+console.log(data.valido);   // true
+console.log(data.estado);   // "ACEPTADO"
+console.log(data.fuente);   // "SUNAT"`,
+
+    php: `<?php
+
+$apiKey = "TU_API_KEY";
+
+$ch = curl_init("https://api.consultaperuapi.com/api/v1/cpe/consultar");
+curl_setopt_array($ch, [
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_POST           => true,
+    CURLOPT_HTTPHEADER     => ["Content-Type: application/json"],
+    CURLOPT_POSTFIELDS     => json_encode([
+        "token"       => $apiKey,
+        "ruc"         => "20601138572",
+        "tipo"        => "01",  // 01=Factura, 03=Boleta, 07=Nota crédito, 08=Nota débito
+        "serie"       => "F001",
+        "correlativo" => "1234",
+        "fecha"       => "2026-01-15",
+        "monto"       => 1180.00
+    ])
+]);
+
+$body = curl_exec($ch);
+$data = json_decode($body);
+
+echo $data->valido;   // true
+echo $data->estado;   // "ACEPTADO"
+echo $data->fuente;   // "SUNAT"`,
+  },
 }
 
 export default function GuiaPage() {
@@ -287,17 +401,19 @@ export default function GuiaPage() {
   }
 
   const currentFields =
-    endpoint === 'ruc' ? rucFields :
-    endpoint === 'dni' ? dniFields :
-    tipocambioFields
+    endpoint === 'ruc'        ? rucFields :
+    endpoint === 'dni'        ? dniFields :
+    endpoint === 'tipocambio' ? tipocambioFields :
+    cpeFields
 
   const endpointPath =
     endpoint === 'ruc'        ? '/api/v1/consultas' :
     endpoint === 'dni'        ? '/api/v1/consultas-dni' :
-                                '/api/v1/tipo-cambio'
+    endpoint === 'tipocambio' ? '/api/v1/tipo-cambio' :
+                                '/api/v1/cpe/consultar'
 
-  const isTipoCambio = endpoint === 'tipocambio'
-  const httpMethod   = isTipoCambio ? 'GET' : 'POST'
+  const isGet      = endpoint === 'tipocambio'
+  const httpMethod = isGet ? 'GET' : 'POST'
 
   return (
     <div className="max-w-3xl">
@@ -306,11 +422,12 @@ export default function GuiaPage() {
 
       {/* Selección de Endpoint */}
       <div className="flex gap-2 mb-5 flex-wrap">
-        {(['ruc', 'dni', 'tipocambio'] as EndpointType[]).map((ep) => {
+        {(['ruc', 'dni', 'tipocambio', 'cpe'] as EndpointType[]).map((ep) => {
           const labels: Record<EndpointType, string> = {
             ruc:        '💼 Buscar RUC',
             dni:        '👤 Buscar DNI',
             tipocambio: '💱 Tipo de cambio',
+            cpe:        '🧾 Validar CPE',
           }
           return (
             <button
@@ -332,12 +449,12 @@ export default function GuiaPage() {
       <div className="bg-white rounded-xl border border-gray-200 p-5 mb-5">
         <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Endpoint</p>
         <div className="flex items-center gap-3">
-          <span className={`text-xs font-bold px-2 py-1 rounded ${isTipoCambio ? 'bg-green-50 text-green-700' : 'bg-blue-50 text-blue-700'}`}>
+          <span className={`text-xs font-bold px-2 py-1 rounded ${isGet ? 'bg-green-50 text-green-700' : 'bg-blue-50 text-blue-700'}`}>
             {httpMethod}
           </span>
           <code className="text-sm font-mono text-gray-800">{endpointPath}</code>
         </div>
-        {isTipoCambio ? (
+        {isGet ? (
           <div className="mt-2 space-y-1">
             <p className="text-xs text-gray-400">
               Query params: <code className="bg-gray-100 px-1 rounded">?token=TU_API_KEY&amp;fecha=2025-01-15</code>{' '}
@@ -348,14 +465,23 @@ export default function GuiaPage() {
             </p>
           </div>
         ) : (
-          <p className="text-xs text-gray-400 mt-2">
-            Body requerido:{' '}
-            <code className="bg-gray-100 px-1 rounded">
-              {endpoint === 'ruc'
-                ? '{ "token": "TU_API_KEY", "ruc": "20123456789" }'
-                : '{ "token": "TU_API_KEY", "dni": "45678901" }'}
-            </code>
-          </p>
+          <div className="mt-2 space-y-1">
+            <p className="text-xs text-gray-400">
+              Body requerido:{' '}
+              <code className="bg-gray-100 px-1 rounded">
+                {endpoint === 'cpe'
+                  ? '{"token":"TU_API_KEY","ruc":"20601138572","tipo":"01","serie":"F001","correlativo":"1234","fecha":"2026-01-15","monto":1180.00}'
+                  : endpoint === 'ruc'
+                    ? '{"token": "TU_API_KEY", "ruc": "20123456789"}'
+                    : '{"token": "TU_API_KEY", "dni": "45678901"}'}
+              </code>
+            </p>
+            {endpoint === 'cpe' && (
+              <p className="text-xs text-gray-400">
+                tipo: <code className="bg-gray-100 px-1 rounded">01</code>=Factura · <code className="bg-gray-100 px-1 rounded">03</code>=Boleta · <code className="bg-gray-100 px-1 rounded">07</code>=Nota de crédito · <code className="bg-gray-100 px-1 rounded">08</code>=Nota de débito
+              </p>
+            )}
+          </div>
         )}
       </div>
 
