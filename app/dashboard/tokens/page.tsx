@@ -14,7 +14,7 @@ type Token = {
 // Límites de tokens por plan
 const TOKEN_LIMITS = {
   1: 1,    // Free: 1 token
-  2: 10,   // Starter: 10 tokens
+  2: 3,    // Starter: 3 tokens
   3: -1,   // Pro: ilimitado
 }
 
