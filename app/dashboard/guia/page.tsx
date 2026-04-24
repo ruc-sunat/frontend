@@ -503,7 +503,7 @@ export default function GuiaPage() {
       </div>
 
       {/* Code block */}
-      <div className="bg-gray-900 rounded-b-xl rounded-tr-xl overflow-hidden mb-5">
+      <div className="bg-gray-900 rounded-b-xl rounded-tr-xl overflow-x-auto mb-5">
         <div className="flex items-center justify-between px-5 py-3 border-b border-white/10">
           <div className="flex items-center gap-2">
             <div className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
