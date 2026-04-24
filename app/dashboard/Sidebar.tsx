@@ -9,6 +9,7 @@ import ContactFormModal from './ContactFormModal'
 const navItems = [
   { href: '/dashboard', label: 'Resumen', icon: '◈' },
   { href: '/dashboard/tokens', label: 'Tokens', icon: '⚿' },
+  { href: '/dashboard/historial', label: 'Historial', icon: '☰' },
   { href: '/dashboard/planes', label: 'Planes', icon: '◇' },
   { href: '/dashboard/guia', label: 'Guía', icon: '◎' },
   { href: '/dashboard/cuenta', label: 'Cuenta', icon: '⚙' },
