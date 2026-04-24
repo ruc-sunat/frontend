@@ -15,14 +15,23 @@ export default async function DashboardPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Fetch user subscription details
-  const { data: userData } = await supabase
-    .from("users")
-    .select("plan_id, subscription_status, plan_expires_at")
-    .eq("id", user!.id)
-    .single();
+  const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 
-  // Fetch plan details
+  // Fetch user data and consultas count in parallel
+  const [{ data: userData }, { count: consultasCount }] = await Promise.all([
+    supabase
+      .from("users")
+      .select("plan_id, subscription_status, plan_expires_at")
+      .eq("id", user!.id)
+      .single(),
+    supabase
+      .from("consultas_log")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user!.id)
+      .gte("created_at", monthStart.toISOString()),
+  ]);
+
+  // Fetch plan details (depends on userData.plan_id)
   const { data: planData } = await supabase
     .from("planes")
     .select("id, nombre, consultas_mes")
@@ -45,17 +54,6 @@ export default async function DashboardPage() {
     limite = planData.consultas_mes;
     plan = planData.nombre;
   }
-
-  // Count this month's queries
-  const monthStart = new Date(
-    new Date().getFullYear(),
-    new Date().getMonth(),
-    1
-  );
-  const { count: consultasCount } = await supabase
-    .from("consultas_log")
-    .select("id", { count: "exact", head: true })
-    .gte("created_at", monthStart.toISOString());
 
   const consultas = consultasCount ?? 0;
 
