@@ -79,6 +79,11 @@ export default function TokensClient({ initialTokens, planId, userId }: TokensCl
     setTokens((prev) => prev.map((t) => (t.id === id ? { ...t, activo: false } : t)))
   }
 
+  const deleteToken = async (id: string) => {
+    await supabase.from('tokens').delete().eq('id', id)
+    setTokens((prev) => prev.filter((t) => t.id !== id))
+  }
+
   const copyToken = (token: string) => {
     navigator.clipboard.writeText(token)
     setCopied(token)
@@ -149,18 +154,27 @@ export default function TokensClient({ initialTokens, planId, userId }: TokensCl
                 </p>
               </div>
               <div className="flex gap-2 flex-shrink-0 flex-wrap">
-                <button
-                  onClick={() => copyToken(t.token)}
-                  className="text-xs px-3 py-1.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 hover:border-gray-400 transition-colors cursor-pointer font-medium"
-                >
-                  {copied === t.token ? '✓ Copiado' : 'Copiar'}
-                </button>
                 {t.activo && (
                   <button
+                    onClick={() => copyToken(t.token)}
+                    className="text-xs px-3 py-1.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 hover:border-gray-400 transition-colors cursor-pointer font-medium"
+                  >
+                    {copied === t.token ? '✓ Copiado' : 'Copiar'}
+                  </button>
+                )}
+                {t.activo ? (
+                  <button
                     onClick={() => deactivateToken(t.id)}
-                    className="text-xs px-3 py-1.5 border border-red-200 text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+                    className="text-xs px-3 py-1.5 border border-red-200 text-red-600 rounded-lg hover:bg-red-50 transition-colors cursor-pointer"
                   >
                     Desactivar
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => deleteToken(t.id)}
+                    className="text-xs px-3 py-1.5 border border-red-200 text-red-600 rounded-lg hover:bg-red-50 transition-colors cursor-pointer"
+                  >
+                    Eliminar
                   </button>
                 )}
               </div>
