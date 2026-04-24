@@ -565,7 +565,7 @@ export default function PlanesClient({
       {/* Modal de pago Izipay */}
       {showModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden">
+          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
               <div>
                 <h2 className="text-sm font-semibold text-gray-900">
@@ -622,7 +622,7 @@ export default function PlanesClient({
       {/* Modal de cancelación */}
       {showCancelModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-6">
+          <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-6 max-h-[90vh] overflow-y-auto">
             <h2 className="text-base font-semibold text-gray-900 mb-2">
               Cancelar suscripción
             </h2>
@@ -633,7 +633,7 @@ export default function PlanesClient({
               </span>
               . Después se bajará automáticamente al plan Free.
             </p>
-            <div className="flex gap-3">
+            <div className="flex flex-col-reverse sm:flex-row gap-3">
               <button
                 onClick={() => setShowCancelModal(false)}
                 className="flex-1 py-2 px-4 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50"

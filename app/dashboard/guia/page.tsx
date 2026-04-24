@@ -416,7 +416,7 @@ export default function GuiaPage() {
   const httpMethod = isGet ? 'GET' : 'POST'
 
   return (
-    <div className="max-w-3xl">
+    <div className="max-w-3xl w-full">
       <h1 className="text-2xl font-bold text-gray-900 mb-1">Guía de integración</h1>
       <p className="text-sm text-gray-500 mb-6">Ejemplos de código para consultar la API desde tu lenguaje favorito.</p>
 
@@ -518,7 +518,7 @@ export default function GuiaPage() {
             {copied ? '✓ Copiado' : 'Copiar'}
           </button>
         </div>
-        <pre className="p-5 text-sm leading-relaxed overflow-x-auto font-mono text-gray-300">
+        <pre className="p-3 sm:p-5 text-xs sm:text-sm leading-relaxed overflow-x-auto font-mono text-gray-300">
           {codeSnippets[endpoint][language]}
         </pre>
       </div>

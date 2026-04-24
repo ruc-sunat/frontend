@@ -85,7 +85,7 @@ export default async function DashboardPage() {
   });
 
   return (
-    <div className="max-w-3xl">
+    <div className="max-w-3xl w-full">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Resumen</h1>
 
       {/* Card soporte Pro */}

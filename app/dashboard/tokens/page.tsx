@@ -106,7 +106,7 @@ export default function TokensPage() {
   }
 
   return (
-    <div className="max-w-3xl">
+    <div className="max-w-3xl w-full">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Tokens de API</h1>
 
       {/* Crear token */}
@@ -119,7 +119,7 @@ export default function TokensPage() {
             </span>
           )}
         </div>
-        <form onSubmit={createToken} className="flex gap-3">
+        <form onSubmit={createToken} className="flex flex-col sm:flex-row gap-3">
           <input
             type="text"
             value={nombre}
@@ -149,7 +149,7 @@ export default function TokensPage() {
           <div className="p-6 text-sm text-gray-400">No tienes tokens aún. Crea uno arriba.</div>
         ) : (
           tokens.map((t) => (
-            <div key={t.id} className="p-4 flex items-center gap-4">
+            <div key={t.id} className="p-4 flex flex-col sm:flex-row sm:items-center gap-3">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-0.5">
                   <span className="text-sm font-medium text-gray-800">
@@ -170,7 +170,7 @@ export default function TokensPage() {
                   Creado {new Date(t.created_at).toLocaleDateString('es-PE')}
                 </p>
               </div>
-              <div className="flex gap-2 flex-shrink-0">
+              <div className="flex gap-2 flex-shrink-0 flex-wrap">
                 <button
                   onClick={() => copyToken(t.token)}
                   className="text-xs px-3 py-1.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 hover:border-gray-400 transition-colors cursor-pointer font-medium"

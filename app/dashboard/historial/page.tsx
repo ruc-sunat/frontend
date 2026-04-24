@@ -112,7 +112,7 @@ export default function HistorialPage() {
   // Pantalla de carga inicial
   if (planId === null) {
     return (
-      <div className="max-w-4xl">
+      <div className="max-w-4xl w-full">
         <h1 className="text-2xl font-bold text-gray-900 mb-6">Historial de consultas</h1>
         <div className="p-6 text-sm text-gray-400">Cargando...</div>
       </div>
@@ -122,7 +122,7 @@ export default function HistorialPage() {
   // Pantalla de bloqueo para planes Free y Starter
   if (planId !== 3) {
     return (
-      <div className="max-w-4xl">
+      <div className="max-w-4xl w-full">
         <h1 className="text-2xl font-bold text-gray-900 mb-6">Historial de consultas</h1>
         <div className="bg-white rounded-xl border border-gray-200 p-12 flex flex-col items-center text-center">
           <span className="text-4xl mb-4">☰</span>
@@ -144,8 +144,8 @@ export default function HistorialPage() {
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
   return (
-    <div className="max-w-4xl">
-      <div className="flex items-center justify-between mb-6">
+    <div className="max-w-4xl w-full">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Historial de consultas</h1>
           {!loading && (
@@ -154,7 +154,7 @@ export default function HistorialPage() {
             </p>
           )}
         </div>
-        <div className="flex flex-col items-end gap-1">
+        <div className="flex flex-col items-start sm:items-end gap-1">
           <button
             onClick={handleExport}
             disabled={exporting}
@@ -167,45 +167,49 @@ export default function HistorialPage() {
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div className="grid grid-cols-[160px_1fr_1fr_80px] gap-4 px-4 py-2.5 border-b border-gray-100 bg-gray-50">
-          <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Fecha</span>
-          <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Tipo</span>
-          <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Parámetro</span>
-          <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Estado</span>
-        </div>
+        <div className="overflow-x-auto">
+          <div className="min-w-[560px]">
+            <div className="grid grid-cols-[150px_1fr_1fr_80px] gap-4 px-4 py-2.5 border-b border-gray-100 bg-gray-50">
+              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Fecha</span>
+              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Tipo</span>
+              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Parámetro</span>
+              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Estado</span>
+            </div>
 
-        {loading ? (
-          <div className="p-6 text-sm text-gray-400">Cargando...</div>
-        ) : rows.length === 0 ? (
-          <div className="p-6 text-sm text-gray-400">No hay consultas registradas aún.</div>
-        ) : (
-          <div className="divide-y divide-gray-100">
-            {rows.map((r) => (
-              <div key={r.id} className="grid grid-cols-[160px_1fr_1fr_80px] gap-4 px-4 py-3 items-center">
-                <span className="text-xs text-gray-500 font-mono">
-                  {new Date(r.created_at).toLocaleString('es-PE', {
-                    timeZone: 'America/Lima',
-                    day: '2-digit', month: '2-digit', year: 'numeric',
-                    hour: '2-digit', minute: '2-digit', hour12: false,
-                  })}
-                </span>
-                <span className="text-sm text-gray-700">
-                  {TIPO_LABELS[r.tipo] ?? r.tipo}
-                </span>
-                <span className="text-sm text-gray-800 font-mono truncate">
-                  {r.parametro}
-                </span>
-                <span className={`text-xs px-2 py-0.5 rounded-full font-medium w-fit ${
-                  r.exitoso
-                    ? 'bg-green-50 text-green-700'
-                    : 'bg-red-50 text-red-600'
-                }`}>
-                  {r.exitoso ? 'Exitoso' : 'Fallido'}
-                </span>
+            {loading ? (
+              <div className="p-6 text-sm text-gray-400">Cargando...</div>
+            ) : rows.length === 0 ? (
+              <div className="p-6 text-sm text-gray-400">No hay consultas registradas aún.</div>
+            ) : (
+              <div className="divide-y divide-gray-100">
+                {rows.map((r) => (
+                  <div key={r.id} className="grid grid-cols-[150px_1fr_1fr_80px] gap-4 px-4 py-3 items-center">
+                    <span className="text-xs text-gray-500 font-mono">
+                      {new Date(r.created_at).toLocaleString('es-PE', {
+                        timeZone: 'America/Lima',
+                        day: '2-digit', month: '2-digit', year: 'numeric',
+                        hour: '2-digit', minute: '2-digit', hour12: false,
+                      })}
+                    </span>
+                    <span className="text-sm text-gray-700">
+                      {TIPO_LABELS[r.tipo] ?? r.tipo}
+                    </span>
+                    <span className="text-sm text-gray-800 font-mono truncate">
+                      {r.parametro}
+                    </span>
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium w-fit ${
+                      r.exitoso
+                        ? 'bg-green-50 text-green-700'
+                        : 'bg-red-50 text-red-600'
+                    }`}>
+                      {r.exitoso ? 'Exitoso' : 'Fallido'}
+                    </span>
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
           </div>
-        )}
+        </div>
       </div>
 
       {totalPages > 1 && (

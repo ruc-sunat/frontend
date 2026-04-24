@@ -18,9 +18,11 @@ const navItems = [
 interface SidebarProps {
   userEmail: string
   planId: number
+  isOpen?: boolean
+  onClose?: () => void
 }
 
-export default function Sidebar({ userEmail, planId }: SidebarProps) {
+export default function Sidebar({ userEmail, planId, isOpen = false, onClose }: SidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const [showContactModal, setShowContactModal] = useState(false)
@@ -35,14 +37,26 @@ export default function Sidebar({ userEmail, planId }: SidebarProps) {
 
   return (
     <>
-      <aside className="w-56 bg-white border-r border-gray-200 flex flex-col">
-        <div className="p-5 border-b border-gray-100 flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center shrink-0">
-            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
-            </svg>
+      <aside className={`fixed inset-y-0 left-0 z-40 w-72 md:static md:w-56 flex flex-col bg-white border-r border-gray-200 transition-transform duration-200 ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+        <div className="p-5 border-b border-gray-100 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center shrink-0">
+              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
+              </svg>
+            </div>
+            <span className="text-base font-bold text-gray-900">Consulta Perú API</span>
           </div>
-          <span className="text-base font-bold text-gray-900">Consulta Perú API</span>
+          {/* Botón cerrar — solo visible en móvil */}
+          <button
+            onClick={onClose}
+            className="md:hidden p-1 text-gray-400 hover:text-gray-600 rounded-lg transition-colors"
+            aria-label="Cerrar menú"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
 
         <nav className="flex-1 p-3 space-y-0.5">
@@ -52,6 +66,7 @@ export default function Sidebar({ userEmail, planId }: SidebarProps) {
               <Link
                 key={href}
                 href={href}
+                onClick={onClose}
                 className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors ${
                   isActive
                     ? 'bg-blue-50 text-blue-700 font-medium'

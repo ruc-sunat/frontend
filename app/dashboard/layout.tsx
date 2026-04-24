@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import Sidebar from './Sidebar'
+import DashboardShell from './DashboardShell'
 
 export default async function DashboardLayout({
   children,
@@ -16,7 +16,6 @@ export default async function DashboardLayout({
     redirect('/login')
   }
 
-  // Fetch user plan
   const { data: userData } = await supabase
     .from('users')
     .select('plan_id')
@@ -26,9 +25,8 @@ export default async function DashboardLayout({
   const planId = userData?.plan_id ?? 1
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar userEmail={user.email ?? ''} planId={planId} />
-      <main className="flex-1 p-8">{children}</main>
-    </div>
+    <DashboardShell userEmail={user.email ?? ''} planId={planId}>
+      {children}
+    </DashboardShell>
   )
 }
