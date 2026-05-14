@@ -63,6 +63,7 @@ declare global {
   interface Window {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     KR: any;
+    gtag?: (...args: unknown[]) => void;
   }
 }
 
@@ -218,7 +219,13 @@ export default function PlanesClient({
     }
   }, []);
 
+  useEffect(() => {
+    window.gtag?.("event", "view_pricing", { location: "app" });
+  }, []);
+
   const handleUpgrade = async (planId: number) => {
+    const planNombre = PLANES.find((p) => p.id === planId)?.nombre.toLowerCase();
+    window.gtag?.("event", "click_upgrade", { plan: planNombre, location: "app" });
     setProcesando(planId);
     setMensaje("");
     setMensajeExito(false);

@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import GaTracker from "./GaTracker";
 import ProSupportCard from "./ProSupportCard";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
@@ -84,6 +85,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="max-w-3xl w-full">
+      <GaTracker consultas={consultas} limite={limite} plan={plan} />
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Resumen</h1>
 
       {/* Card soporte Pro */}
