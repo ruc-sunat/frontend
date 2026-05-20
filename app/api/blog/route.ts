@@ -95,6 +95,40 @@ async function fetchViaRSS(limit: number) {
   })
 }
 
+async function fetchViaRss2Json(limit: number) {
+  const rssUrl = encodeURIComponent(`https://${HASHNODE_HOST}/rss.xml`)
+  const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}&count=${limit}`, {
+    next: { revalidate: 3600 },
+  })
+
+  if (!res.ok) throw new Error(`rss2json fetch failed: ${res.status}`)
+
+  const data = await res.json()
+  if (data.status !== 'ok') throw new Error(`rss2json error: ${data.message}`)
+
+  return (data.items as {
+    title: string
+    link: string
+    description: string
+    pubDate: string
+    thumbnail?: string
+    enclosure?: { link?: string }
+    categories?: string[]
+  }[]).map((item) => {
+    const rawBrief = (item.description || '').replace(/<[^>]+>/g, '')
+    const coverUrl = item.enclosure?.link || item.thumbnail || null
+    return {
+      title: item.title,
+      url: item.link,
+      brief: rawBrief.slice(0, 280),
+      publishedAt: new Date(item.pubDate).toISOString(),
+      coverImage: coverUrl ? { url: coverUrl } : null,
+      readTimeInMinutes: Math.max(1, Math.ceil(rawBrief.split(/\s+/).length / 200)),
+      tags: (item.categories || []).map((c: string) => ({ name: c })),
+    }
+  })
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const limit = Math.min(parseInt(searchParams.get('limit') ?? '3', 10), 20)
@@ -104,8 +138,13 @@ export async function GET(request: Request) {
     try {
       posts = await fetchViaGraphQL(limit)
     } catch (gqlErr) {
-      console.warn('[Blog] GraphQL failed, falling back to RSS:', gqlErr)
-      posts = await fetchViaRSS(limit)
+      console.warn('[Blog] GraphQL failed, trying RSS:', gqlErr)
+      try {
+        posts = await fetchViaRSS(limit)
+      } catch (rssErr) {
+        console.warn('[Blog] RSS failed, trying rss2json:', rssErr)
+        posts = await fetchViaRss2Json(limit)
+      }
     }
     return NextResponse.json({ posts }, { headers: CORS_HEADERS })
   } catch (err) {
