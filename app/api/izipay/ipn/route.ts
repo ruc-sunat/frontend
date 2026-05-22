@@ -64,6 +64,9 @@ export async function POST(request: NextRequest) {
     log('hmac_check', {
       krHashKey,
       keyUsedPrefix: hmacKey.slice(0, 4) || '(empty)',
+      keyUsedLength: hmacKey.length,
+      krAnswerLength: krAnswer.length,
+      krAnswerPreview: krAnswer.slice(0, 120),
       expectedPrefix: expectedHash.slice(0, 8),
       receivedPrefix: krHash.slice(0, 8),
       match: expectedHash === krHash,
