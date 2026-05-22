@@ -15,11 +15,10 @@ function log(event: string, data: Record<string, unknown>) {
 export async function POST(request: NextRequest) {
   try {
     const contentType = request.headers.get('content-type') ?? '(none)'
-    const hmacKey = process.env.IZIPAY_HMAC_KEY ?? ''
     log('request_received', {
       contentType,
-      hmacKeyPresent: !!hmacKey,
-      hmacKeyPrefix: hmacKey.slice(0, 4) || '(empty)',
+      passwordPresent: !!process.env.IZIPAY_PASSWORD,
+      hmacKeyPresent: !!process.env.IZIPAY_HMAC_KEY,
     })
 
     const rawBody = await request.text()
@@ -27,19 +26,22 @@ export async function POST(request: NextRequest) {
 
     let krAnswer: string
     let krHash: string
+    let krHashKey: string
 
     // Intentar form-urlencoded primero (spec de Izipay IPN), JSON como fallback
     const params = new URLSearchParams(rawBody)
     if (params.has('kr-answer')) {
       krAnswer = params.get('kr-answer') ?? ''
       krHash = params.get('kr-hash') ?? ''
-      log('parsed_as', { format: 'form-urlencoded' })
+      krHashKey = params.get('kr-hash-key') ?? ''
+      log('parsed_as', { format: 'form-urlencoded', krHashKey })
     } else {
       try {
         const body = JSON.parse(rawBody)
         krAnswer = body['kr-answer'] ?? ''
         krHash = body['kr-hash'] ?? ''
-        log('parsed_as', { format: 'json' })
+        krHashKey = body['kr-hash-key'] ?? ''
+        log('parsed_as', { format: 'json', krHashKey })
       } catch {
         log('parse_failed', { rawBodyPreview: rawBody.slice(0, 120) })
         return NextResponse.json({ error_code: 'PARSE_ERROR', error: 'Cuerpo ilegible' }, { status: 400 })
@@ -51,9 +53,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error_code: 'MISSING_PARAMS', error: 'Faltan parámetros' }, { status: 400 })
     }
 
-    // Verificar firma HMAC
+    // kr-hash-key indica qué clave usó Izipay para firmar:
+    //   'password'   → contraseña de producción (IZIPAY_PASSWORD)
+    //   'hmacsha256' → clave HMAC SHA-256 separada (IZIPAY_HMAC_KEY)
+    const hmacKey = krHashKey === 'password'
+      ? (process.env.IZIPAY_PASSWORD ?? '')
+      : (process.env.IZIPAY_HMAC_KEY ?? '')
+
     const expectedHash = crypto.createHmac('sha256', hmacKey).update(krAnswer).digest('hex')
     log('hmac_check', {
+      krHashKey,
+      keyUsedPrefix: hmacKey.slice(0, 4) || '(empty)',
       expectedPrefix: expectedHash.slice(0, 8),
       receivedPrefix: krHash.slice(0, 8),
       match: expectedHash === krHash,
@@ -65,7 +75,6 @@ export async function POST(request: NextRequest) {
     const answer = JSON.parse(krAnswer)
 
     if (answer.orderStatus !== 'PAID') {
-      // Pago no completado — no es un error, solo ignoramos
       return NextResponse.json({ received: true })
     }
 
@@ -94,7 +103,6 @@ export async function POST(request: NextRequest) {
         ? new Date(Date.UTC(now.getUTCFullYear() + 1, now.getUTCMonth(), now.getUTCDate()))
         : new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, now.getUTCDate()))
 
-    // Usar service role para escribir sin sesión de usuario
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
