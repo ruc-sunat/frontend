@@ -463,7 +463,9 @@ export default function PlanesClient({
       <div id="plan-cards" className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {PLANES.map((plan) => {
           const esPlanActualActivo =
-            effectiveStatus === "active" && planActual === plan.id;
+            effectiveStatus === "active" && planActual === plan.id && selectedCycle === billingCycle;
+          const esMismoPlanOtroCiclo =
+            effectiveStatus === "active" && planActual === plan.id && selectedCycle !== billingCycle;
           const esPlanCancelado =
             effectiveStatus === "cancelled" && planActual === plan.id;
           const esMenor =
@@ -482,6 +484,13 @@ export default function PlanesClient({
             botonLabel = "Plan gratuito";
           } else if (esPlanActualActivo) {
             botonLabel = "Plan actual";
+          } else if (esMismoPlanOtroCiclo) {
+            botonLabel =
+              procesando === plan.id
+                ? "Procesando..."
+                : selectedCycle === "annual"
+                  ? "Cambiar a anual"
+                  : "Cambiar a mensual";
           } else if (esPlanCancelado) {
             botonLabel =
               procesando === plan.id ? "Procesando..." : "Reactivar plan";
@@ -499,12 +508,19 @@ export default function PlanesClient({
               className={`bg-white rounded-xl border-2 p-6 flex flex-col ${
                 esPlanActualActivo
                   ? "border-blue-500 shadow-sm"
-                  : "border-gray-200"
+                  : esMismoPlanOtroCiclo
+                    ? "border-blue-200"
+                    : "border-gray-200"
               }`}
             >
               {esPlanActualActivo && (
                 <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full self-start mb-3">
                   Plan actual
+                </span>
+              )}
+              {esMismoPlanOtroCiclo && (
+                <span className="text-xs font-semibold text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full self-start mb-3">
+                  Tu plan · {billingCycle === "monthly" ? "Mensual" : "Anual"}
                 </span>
               )}
               {esPlanCancelado && (
