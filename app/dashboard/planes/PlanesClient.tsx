@@ -27,7 +27,7 @@ const PLANES = [
       "Consultas ilimitadas",
       "Generación de 3 tokens para consultas",
       "10 req/seg (rate limit)",
-      "Consulta de (RUC + DNI)",
+      "Consulta de RUC + DNI (sujeto al padrón SUNAT)",
       "Consulta de tipo de cambio SBS",
       "Consulta de Validación CPE",
       "Documentación y ejemplos",
@@ -43,7 +43,7 @@ const PLANES = [
       "Consultas ilimitadas",
       "Generación de múltiples tokens para consulta",
       "30 req/seg (rate limit)",
-      "Consulta de (RUC + DNI)",
+      "Consulta de RUC + DNI (sujeto al padrón SUNAT)",
       "Consulta de tipo de cambio SBS",
       "Consulta de Validación CPE",
       "Consultas en lote (batch)",
@@ -224,8 +224,13 @@ export default function PlanesClient({
   }, []);
 
   const handleUpgrade = async (planId: number) => {
-    const planNombre = PLANES.find((p) => p.id === planId)?.nombre.toLowerCase();
-    window.gtag?.("event", "click_upgrade", { plan: planNombre, location: "app" });
+    const planNombre = PLANES.find(
+      (p) => p.id === planId,
+    )?.nombre.toLowerCase();
+    window.gtag?.("event", "click_upgrade", {
+      plan: planNombre,
+      location: "app",
+    });
     setProcesando(planId);
     setMensaje("");
     setMensajeExito(false);
@@ -463,9 +468,13 @@ export default function PlanesClient({
       <div id="plan-cards" className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {PLANES.map((plan) => {
           const esPlanActualActivo =
-            effectiveStatus === "active" && planActual === plan.id && selectedCycle === billingCycle;
+            effectiveStatus === "active" &&
+            planActual === plan.id &&
+            selectedCycle === billingCycle;
           const esMismoPlanOtroCiclo =
-            effectiveStatus === "active" && planActual === plan.id && selectedCycle !== billingCycle;
+            effectiveStatus === "active" &&
+            planActual === plan.id &&
+            selectedCycle !== billingCycle;
           const esPlanCancelado =
             effectiveStatus === "cancelled" && planActual === plan.id;
           const esMenor =
